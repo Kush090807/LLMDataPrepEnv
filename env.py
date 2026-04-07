@@ -6,6 +6,7 @@ from models import Observation, Action, Reward, DeleteRowAction, UpdateValueActi
 
 class LLMDataPrepEnv:
     def __init__(self):
+        # Using absolute path to ensure Docker finds data.json every time
         self.original_data = self._load_data()
         self.schema = {
             "id": "int",
@@ -26,7 +27,9 @@ class LLMDataPrepEnv:
         self.max_steps = 50
 
     def _load_data(self):
-        data_path = os.path.join(os.path.dirname(__file__), "data.json")
+        # Bulletproof path logic for the container
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        data_path = os.path.join(base_dir, "data.json")
         with open(data_path, "r") as f:
             return json.load(f)
 
@@ -70,7 +73,7 @@ class LLMDataPrepEnv:
                 row = self.current_data[action.row_index]
                 if action.column in row:
                     row[action.column] = action.new_value
-                    # syntax reward for valid target
+                    # Syntax reward for valid target
                     reward_val += 0.1
                 else:
                     reward_val -= 0.1
@@ -83,3 +86,11 @@ class LLMDataPrepEnv:
             done = True
 
         return self.state(), Reward(value=reward_val), done, info
+
+    def close(self):
+        """
+        Required by the OpenEnv framework for session cleanup.
+        We can leave this empty (pass) since we don't have 
+        active database connections to shut down.
+        """
+        pass
