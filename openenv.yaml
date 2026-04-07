@@ -1,0 +1,3 @@
+name: LLMDataPrepEnv
+version: 1.0.0
+description: An agentic environment for autonomous data cleaning and formatting.

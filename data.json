@@ -1,0 +1,107 @@
+[
+  {
+    "id": 101,
+    "name": "Alice Smith",
+    "email": null,
+    "signup_date": "2023-01-15",
+    "purchase_total": 120.5
+  },
+  {
+    "id": 102,
+    "name": "Bob Jones",
+    "email": "bob@example.com",
+    "signup_date": "02/15/2023",
+    "purchase_total": 45.0
+  },
+  {
+    "id": 103,
+    "name": "Charlie Brown",
+    "email": "charlie@example.com",
+    "signup_date": "2023-03-10",
+    "purchase_total": "$150"
+  },
+  {
+    "id": 104,
+    "name": "Diana Ross",
+    "email": "diana@example.com",
+    "signup_date": "04/20/2023",
+    "purchase_total": 85.0
+  },
+  {
+    "id": 105,
+    "name": "Edward Norton",
+    "email": "edward@example.com",
+    "signup_date": "2023-05-05",
+    "purchase_total": "200 EUR"
+  },
+  {
+    "id": 106,
+    "name": "Fiona Apple",
+    "email": null,
+    "signup_date": "2023-06-12",
+    "purchase_total": 310.0
+  },
+  {
+    "id": 107,
+    "name": "George Lucas",
+    "email": "george@example.com",
+    "signup_date": "07/11/2023",
+    "purchase_total": 150.25
+  },
+  {
+    "id": 108,
+    "name": "Hannah Abbott",
+    "email": "hannah@example.com",
+    "signup_date": "2023-08-21",
+    "purchase_total": "£50"
+  },
+  {
+    "id": 109,
+    "name": "Ian McKellen",
+    "email": "ian@example.com",
+    "signup_date": "09/05/2023",
+    "purchase_total": 420.0
+  },
+  {
+    "id": 110,
+    "name": "Julia Roberts",
+    "email": "julia@example.com",
+    "signup_date": "2023-10-18",
+    "purchase_total": "100.5 USD"
+  },
+  {
+    "id": 111,
+    "name": "Kevin Bacon",
+    "email": null,
+    "signup_date": "2023-11-22",
+    "purchase_total": 75.0
+  },
+  {
+    "id": 112,
+    "name": "Laura Dern",
+    "email": "laura@example.com",
+    "signup_date": "12/01/2023",
+    "purchase_total": 190.0
+  },
+  {
+    "id": 113,
+    "name": "Michael Caine",
+    "email": "michael@example.com",
+    "signup_date": "2024-01-08",
+    "purchase_total": "A$300"
+  },
+  {
+    "id": 114,
+    "name": "Natalie Portman",
+    "email": "natalie@example.com",
+    "signup_date": "2024-02-14",
+    "purchase_total": 215.5
+  },
+  {
+    "id": 115,
+    "name": "Oscar Isaac",
+    "email": "oscar@example.com",
+    "signup_date": "2024-03-30",
+    "purchase_total": 55.0
+  }
+]
