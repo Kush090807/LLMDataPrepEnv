@@ -1,11 +1,11 @@
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union, Literal # Added Union and Literal here
 
 class Observation(BaseModel):
     dataset: List[Dict[str, Any]]
     target_schema: Dict[str, str]
     conversion_rates: Dict[str, float]
-    # ADD THIS LINE BELOW
+    # This is the line that fixes the 'Observation' object has no attribute 'reward' error
     reward: Optional[float] = 0.0
 
 class DeleteRowAction(BaseModel):
@@ -22,7 +22,7 @@ class UpdateValueAction(BaseModel):
 class PassAction(BaseModel):
     action_type: Literal["PassAction"] = "PassAction"
 
-# Optional: Add an explicit type field or use discriminator if desired, but this works fine for openai function calling
+# This defines the set of allowed actions the AI can take
 Action = Union[DeleteRowAction, UpdateValueAction, PassAction]
 
 class Reward(BaseModel):
