@@ -25,7 +25,7 @@ def log_end(success: bool, steps: int, score: float, rewards: list):
 def main():
     api_base = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
     model_name = os.getenv("MODEL_NAME", "gpt-3.5-turbo")
-    hf_token = os.getenv("HF_TOKEN", "")
+    hf_token = os.getenv("HF_TOKEN")
     api_key = os.getenv("OPENAI_API_KEY", hf_token)
 
     # Initialize client, use dummy key if none provided so it doesn't crash on init
