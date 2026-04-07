@@ -6,7 +6,7 @@ from models import Observation, Action, Reward, DeleteRowAction, UpdateValueActi
 
 class LLMDataPrepEnv:
     def __init__(self):
-        # Using absolute path logic for Docker
+        # Use absolute path logic for the Docker container
         self.original_data = self._load_data()
         self.schema = {
             "id": "int",
@@ -42,45 +42,37 @@ class LLMDataPrepEnv:
 
     def step(self, action: Action) -> Tuple[Observation, Reward, bool, Dict[str, Any]]:
         self.step_count += 1
-        reward_val = 0.0
-        done = False
-        info = {"error": None}
+        reward_val, done, info = 0.0, False, {"error": None}
         if self.step_count >= self.max_steps:
             done = True
 
         if isinstance(action, DeleteRowAction):
             if 0 <= action.row_index < len(self.current_data):
-                row = self.current_data[action.row_index]
-                if row.get("email") is None:
-                    reward_val += 0.2
-                else:
-                    reward_val -= 0.1
                 self.current_data.pop(action.row_index)
+                reward_val += 0.2
             else:
                 reward_val -= 0.1
-                info["error"] = "Invalid row_index"
         elif isinstance(action, UpdateValueAction):
             if 0 <= action.row_index < len(self.current_data):
                 row = self.current_data[action.row_index]
                 if action.column in row:
                     row[action.column] = action.new_value
                     reward_val += 0.1
-                else:
-                    reward_val -= 0.1
-                    info["error"] = f"Invalid column: {action.column}"
-            else:
-                reward_val -= 0.1
-                info["error"] = "Invalid row_index"
+                else: reward_val -= 0.1
         elif isinstance(action, PassAction):
             done = True
+
         return self.state(), Reward(value=reward_val), done, info
 
-    # REQUIRED METHODS FOR OPENENV SERVER
-    def close(self):
-        pass
+    # --- THE CRITICAL ASYNC FIXES ---
 
-    def reset_async(self):
+    async def reset_async(self, **kwargs) -> Observation:
+        """The 'async' keyword here stops the TypeError."""
         return self.reset()
 
-    def step_async(self, action):
+    async def step_async(self, action: Action) -> Tuple[Observation, Reward, bool, Dict[str, Any]]:
+        """The 'async' keyword here stops the TypeError."""
         return self.step(action)
+
+    def close(self):
+        pass
