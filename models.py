@@ -1,10 +1,12 @@
-from pydantic import BaseModel, Field
-from typing import List, Dict, Any, Union, Optional, Literal
+from pydantic import BaseModel
+from typing import List, Dict, Any, Optional
 
 class Observation(BaseModel):
     dataset: List[Dict[str, Any]]
     target_schema: Dict[str, str]
     conversion_rates: Dict[str, float]
+    # ADD THIS LINE BELOW
+    reward: Optional[float] = 0.0
 
 class DeleteRowAction(BaseModel):
     action_type: Literal["DeleteRowAction"] = "DeleteRowAction"
