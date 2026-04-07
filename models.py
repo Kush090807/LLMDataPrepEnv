@@ -1,11 +1,13 @@
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional, Union, Literal # <--- ADDED Union and Literal
+from typing import List, Dict, Any, Optional, Union, Literal
 
 class Observation(BaseModel):
     dataset: List[Dict[str, Any]]
     target_schema: Dict[str, str]
     conversion_rates: Dict[str, float]
     reward: Optional[float] = 0.0
+    # ADD THIS LINE BELOW
+    done: bool = False 
 
 class DeleteRowAction(BaseModel):
     action_type: Literal["DeleteRowAction"] = "DeleteRowAction"
@@ -21,7 +23,6 @@ class UpdateValueAction(BaseModel):
 class PassAction(BaseModel):
     action_type: Literal["PassAction"] = "PassAction"
 
-# This defines the set of allowed actions
 Action = Union[DeleteRowAction, UpdateValueAction, PassAction]
 
 class Reward(BaseModel):
