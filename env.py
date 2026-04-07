@@ -6,7 +6,7 @@ from models import Observation, Action, Reward, DeleteRowAction, UpdateValueActi
 
 class LLMDataPrepEnv:
     def __init__(self):
-        # Use absolute path logic for the Docker container
+        # Absolute path logic for Docker
         self.original_data = self._load_data()
         self.schema = {
             "id": "int",
@@ -15,9 +15,7 @@ class LLMDataPrepEnv:
             "signup_date": "str (ISO format YYYY-MM-DD)",
             "purchase_total": "float (in USD)"
         }
-        self.conversion_rates = {
-            "EUR": 1.10, "£": 1.25, "$": 1.0, "USD": 1.0, "A$": 0.65
-        }
+        self.conversion_rates = {"EUR": 1.10, "£": 1.25, "$": 1.0, "USD": 1.0, "A$": 0.65}
         self.current_data = []
         self.step_count = 0
         self.max_steps = 50
@@ -28,19 +26,22 @@ class LLMDataPrepEnv:
         with open(data_path, "r") as f:
             return json.load(f)
 
-    def reset(self) -> Observation:
+    # NOW ASYNC
+    async def reset(self, **kwargs) -> Observation:
         self.current_data = copy.deepcopy(self.original_data)
         self.step_count = 0
-        return self.state()
+        return await self.state()
 
-    def state(self) -> Observation:
+    # NOW ASYNC
+    async def state(self) -> Observation:
         return Observation(
             dataset=self.current_data,
             target_schema=self.schema,
             conversion_rates=self.conversion_rates
         )
 
-    def step(self, action: Action) -> Tuple[Observation, Reward, bool, Dict[str, Any]]:
+    # NOW ASYNC
+    async def step(self, action: Action) -> Tuple[Observation, Reward, bool, Dict[str, Any]]:
         self.step_count += 1
         reward_val, done, info = 0.0, False, {"error": None}
         if self.step_count >= self.max_steps:
@@ -62,17 +63,14 @@ class LLMDataPrepEnv:
         elif isinstance(action, PassAction):
             done = True
 
-        return self.state(), Reward(value=reward_val), done, info
+        return await self.state(), Reward(value=reward_val), done, info
 
-    # --- THE CRITICAL ASYNC FIXES ---
+    # MANDATORY WRAPPERS FOR THE EVALUATOR
+    async def reset_async(self, **kwargs):
+        return await self.reset(**kwargs)
 
-    async def reset_async(self, **kwargs) -> Observation:
-        """The 'async' keyword here stops the TypeError."""
-        return self.reset()
-
-    async def step_async(self, action: Action) -> Tuple[Observation, Reward, bool, Dict[str, Any]]:
-        """The 'async' keyword here stops the TypeError."""
-        return self.step(action)
+    async def step_async(self, action):
+        return await self.step(action)
 
     def close(self):
         pass
