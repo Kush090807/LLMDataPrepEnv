@@ -6,7 +6,6 @@ from models import Observation, Action, Reward, DeleteRowAction, UpdateValueActi
 
 class LLMDataPrepEnv:
     def __init__(self):
-        # Absolute path logic for Docker
         self.original_data = self._load_data()
         self.schema = {
             "id": "int",
@@ -26,33 +25,40 @@ class LLMDataPrepEnv:
         with open(data_path, "r") as f:
             return json.load(f)
 
-    # NOW ASYNC
+    # UPDATED: Passes 0.0 reward on reset
     async def reset(self, **kwargs) -> Observation:
         self.current_data = copy.deepcopy(self.original_data)
         self.step_count = 0
-        return await self.state()
+        return await self.state(reward=0.0)
 
-    # NOW ASYNC
-    async def state(self) -> Observation:
+    # UPDATED: Accepts reward and puts it in the Observation object
+    async def state(self, reward: float = 0.0) -> Observation:
         return Observation(
             dataset=self.current_data,
             target_schema=self.schema,
-            conversion_rates=self.conversion_rates
+            conversion_rates=self.conversion_rates,
+            reward=reward  # <--- This connects to your models.py change
         )
 
-    # NOW ASYNC
     async def step(self, action: Action) -> Tuple[Observation, Reward, bool, Dict[str, Any]]:
         self.step_count += 1
         reward_val, done, info = 0.0, False, {"error": None}
         if self.step_count >= self.max_steps:
             done = True
 
+        # --- Your existing action logic ---
         if isinstance(action, DeleteRowAction):
             if 0 <= action.row_index < len(self.current_data):
+                row = self.current_data[action.row_index]
+                if row.get("email") is None:
+                    reward_val += 0.2
+                else:
+                    reward_val -= 0.1
                 self.current_data.pop(action.row_index)
-                reward_val += 0.2
             else:
                 reward_val -= 0.1
+                info["error"] = "Invalid row_index"
+        
         elif isinstance(action, UpdateValueAction):
             if 0 <= action.row_index < len(self.current_data):
                 row = self.current_data[action.row_index]
@@ -60,12 +66,16 @@ class LLMDataPrepEnv:
                     row[action.column] = action.new_value
                     reward_val += 0.1
                 else: reward_val -= 0.1
+            else:
+                reward_val -= 0.1
+                info["error"] = "Invalid row_index"
+                
         elif isinstance(action, PassAction):
             done = True
 
-        return await self.state(), Reward(value=reward_val), done, info
+        # UPDATED: Returns state with the calculated reward_val
+        return await self.state(reward=reward_val), Reward(value=reward_val), done, info
 
-    # MANDATORY WRAPPERS FOR THE EVALUATOR
     async def reset_async(self, **kwargs):
         return await self.reset(**kwargs)
 
