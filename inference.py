@@ -23,17 +23,14 @@ def log_end(success: bool, steps: int, score: float, rewards: list):
     sys.stdout.flush()
 
 def main():
-    api_base = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
-    model_name = os.getenv("MODEL_NAME", "gpt-3.5-turbo")
-    hf_token = os.getenv("HF_TOKEN")
+    api_base = os.getenv("API_BASE_URL", "https://kushpatel9a7-llmdataprepenv.hf.space")
+    model_name = os.getenv("MODEL_NAME", "gpt-4o") 
+    hf_token = os.getenv("HF_TOKEN") 
+    
     api_key = os.getenv("OPENAI_API_KEY", hf_token)
 
-    # Initialize client, use dummy key if none provided so it doesn't crash on init
     client = OpenAI(base_url=api_base, api_key=api_key if api_key else "dummy")
 
-    env = LLMDataPrepEnv()
-    graders = DatasetGraders(env)
-    
     log_start("data_cleaning_pipeline", model_name)
     
     obs = env.reset()
@@ -41,12 +38,10 @@ def main():
     step_idx = 0
     all_rewards = []
     
-    # We will simulate a baseline run. 
-    # For a deterministic reproducible baseline (and to avoid hanging when API key is missing during automated test)
-    # we can explicitly pass actions designed to clean some data if API fails.
+    
     actions_to_take = [
         DeleteRowAction(row_index=0, reason="Null email"),
-        DeleteRowAction(row_index=4, reason="Null email"), # Adjusted index after deletion
+        DeleteRowAction(row_index=4, reason="Null email"), 
         DeleteRowAction(row_index=8, reason="Null email"),
         UpdateValueAction(row_index=1, column="signup_date", new_value="2023-02-15"),
         PassAction()
@@ -69,9 +64,9 @@ def main():
             done = True
             break
             
-    # Calculate grades
+    
     grades = graders.evaluate()
-    # Simple average score across the 3 tasks
+    
     final_score = (grades["task_1_easy"] + grades["task_2_medium"] + grades["task_3_hard"]) / 3.0
     success = final_score == 1.0
     
