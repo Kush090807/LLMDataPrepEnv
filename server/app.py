@@ -16,8 +16,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-if __name__ == "__main__":
-    import uvicorn
-    # Hugging Face Spaces MUST run on port 7860
-    uvicorn.run(app, host="0.0.0.0", port=7860)
